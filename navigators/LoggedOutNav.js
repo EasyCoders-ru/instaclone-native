@@ -8,10 +8,24 @@ export default function LoggedOutNav() {
   const Stack = createNativeStackNavigator();
 
   return (
-    <Stack.Navigator>
-      <Stack.Screen name="Welcome" component={Welcome} />
-      <Stack.Screen name="LogIn" component={LogIn} />
-      <Stack.Screen name="CreateAccount" component={CreateAccount} />
+    <Stack.Navigator screenOptions={{ headerBackVisible: false }}>
+      <Stack.Screen
+        name="Welcome"
+        component={Welcome}
+        options={{
+          title: "Добро пожаловать!",
+        }}
+      />
+      <Stack.Screen
+        name="LogIn"
+        component={LogIn}
+        options={{ title: "Вход в аккаунт" }}
+      />
+      <Stack.Screen
+        name="CreateAccount"
+        component={CreateAccount}
+        options={{ title: "Регистрация" }}
+      />
     </Stack.Navigator>
   );
 }
