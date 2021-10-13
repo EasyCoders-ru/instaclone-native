@@ -1,56 +1,57 @@
 import React from "react";
-import { Text, View, StyleSheet, useColorScheme } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import styled from "styled-components/native";
+import { colors } from "../colors";
+
+const Container = styled.View`
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  background-color: black;
+`;
+
+const Logo = styled.Image`
+  height: 100px;
+  max-width: 50%;
+`;
+
+const CreateAccount = styled.View`
+  padding: 7px 10px;
+  background-color: ${colors.blue};
+  border-radius: 3px;
+`;
+
+const CreateAccountText = styled.Text`
+  color: white;
+  font-weight: 600;
+`;
+
+const LoginLink = styled.Text`
+  color: ${colors.blue};
+  font-weight: 600;
+  margin-top: 10px;
+`;
 
 export default function Welcome({ navigation }) {
-  const colorScheme = useColorScheme();
+  const goToCreateAccount = () => {
+    navigation.navigate("CreateAccount");
+  };
 
-  const themeTextStyle =
-    colorScheme === "light" ? styles.lightThemeText : styles.darkThemeText;
-  const themeContainerStyle =
-    colorScheme === "light" ? styles.lightContainer : styles.darkContainer;
+  const goToLogin = () => {
+    navigation.navigate("LogIn");
+  };
 
   return (
-    <View style={[styles.container, themeContainerStyle]}>
-      <Text style={[styles.text, themeTextStyle]}>Добро пожаловать!</Text>
-      <TouchableOpacity
-        onPress={() => {
-          navigation.navigate("CreateAccount");
-        }}
-      >
-        <View style={[styles.container, themeContainerStyle]}>
-          <Text style={[styles.text, themeTextStyle]}>Создать аккаунт</Text>
-        </View>
+    <Container>
+      <Logo resizeMode="contain" source={require("../assets/logo.png")} />
+      <TouchableOpacity onPress={goToCreateAccount}>
+        <CreateAccount>
+          <CreateAccountText>Создать аккаунт</CreateAccountText>
+        </CreateAccount>
       </TouchableOpacity>
-      <TouchableOpacity
-        onPress={() => {
-          navigation.navigate("LogIn");
-        }}
-      >
-        <View style={[styles.container, themeContainerStyle]}>
-          <Text style={[styles.text, themeTextStyle]}>Войти в аккаунт</Text>
-        </View>
+      <TouchableOpacity onPress={goToLogin}>
+        <LoginLink>Войти в аккаунт</LoginLink>
       </TouchableOpacity>
-    </View>
+    </Container>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  lightContainer: {
-    backgroundColor: "#d0d0c0",
-  },
-  darkContainer: {
-    backgroundColor: "#242c40",
-  },
-  lightThemeText: {
-    color: "#242c40",
-  },
-  darkThemeText: {
-    color: "#d0d0c0",
-  },
-});
