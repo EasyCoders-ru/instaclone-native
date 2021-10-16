@@ -3,14 +3,50 @@ import { TextInput } from "../components/auth/AuthShared";
 import { AuthButton } from "../components/auth/AuthButton";
 import { AuthLayout } from "../components/auth/AuthLayout";
 import { useForm } from "react-hook-form";
+import { gql, useMutation } from "@apollo/client";
 
-export default function CreateAccount() {
+const CREATE_ACCOUNT_MUTATION = gql`
+  mutation createAccount(
+    $firstName: String!
+    $lastName: String
+    $username: String!
+    $email: String!
+    $password: String!
+  ) {
+    createAccount(
+      firstName: $firstName
+      lastName: $lastName
+      username: $username
+      email: $email
+      password: $password
+    ) {
+      ok
+      error
+    }
+  }
+`;
+
+export default function CreateAccount({ navigation }) {
   const lastNameRef = useRef();
   const loginRef = useRef();
   const emailRef = useRef();
   const passwordRef = useRef();
 
-  const { register, handleSubmit, setValue } = useForm();
+  const { register, handleSubmit, setValue, getValues, watch } = useForm();
+
+  const onCompleted = (data) => {
+    const {
+      createAccount: { ok },
+    } = data;
+    if (ok) {
+      const { username, password } = getValues();
+      navigation.navigate("LogIn", { username, password });
+    }
+  };
+
+  const [createAccount, { loading }] = useMutation(CREATE_ACCOUNT_MUTATION, {
+    onCompleted,
+  });
 
   useEffect(() => {
     register("firstName", { required: true });
@@ -25,7 +61,9 @@ export default function CreateAccount() {
   };
 
   const onSubmitValid = (data) => {
-    console.log(data);
+    if (!loading) {
+      createAccount({ variables: { ...data } });
+    }
   };
 
   return (
@@ -94,7 +132,14 @@ export default function CreateAccount() {
       />
       <AuthButton
         text="Создать аккаунт"
-        disabled={false}
+        disabled={
+          !watch("firstName") ||
+          !watch("lastName") ||
+          !watch("username") ||
+          !watch("email") ||
+          !watch("password")
+        }
+        loading={loading}
         onPress={handleSubmit(onSubmitValid)}
       />
     </AuthLayout>

@@ -16,10 +16,15 @@ const LOGIN_MUTATTION = gql`
   }
 `;
 
-export default function LogIn({ navigation }) {
+export default function LogIn({ route: { params } }) {
   const passwordRef = useRef();
 
-  const { register, handleSubmit, setValue, watch } = useForm();
+  const { register, handleSubmit, setValue, watch } = useForm({
+    defaultValues: {
+      username: params?.username,
+      password: params?.password,
+    },
+  });
 
   useEffect(() => {
     register("username", { required: true });
@@ -54,6 +59,7 @@ export default function LogIn({ navigation }) {
   return (
     <AuthLayout>
       <TextInput
+        value={watch("username")}
         placeholder="Логин"
         placeholderTextColor={"rgba(255, 255, 255, 0.6)"}
         returnKeyType="next"
@@ -67,6 +73,7 @@ export default function LogIn({ navigation }) {
       />
       <TextInput
         ref={passwordRef}
+        value={watch("password")}
         placeholder="Пароль"
         placeholderTextColor={"rgba(255, 255, 255, 0.6)"}
         secureTextEntry
