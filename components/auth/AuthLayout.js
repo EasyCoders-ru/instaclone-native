@@ -16,8 +16,11 @@ const Container = styled.View`
 `;
 
 const Logo = styled.Image`
-  height: 100px;
   max-width: 80%;
+  width: 100%;
+  height: 100px;
+  margin: 0 auto;
+  margin-bottom: 20px;
 `;
 
 export function AuthLayout({ children }) {
@@ -26,7 +29,11 @@ export function AuthLayout({ children }) {
   };
 
   return (
-    <TouchableWithoutFeedback style={{ flex: 1 }} onPress={dismissKeyboard}>
+    <TouchableWithoutFeedback
+      style={{ flex: 1 }}
+      onPress={dismissKeyboard}
+      disabled={Platform.OS === "web"}
+    >
       <Container>
         <KeyboardAvoidingView
           style={{
@@ -38,7 +45,10 @@ export function AuthLayout({ children }) {
           behavior="padding"
           keyboardVerticalOffset={Platform.OS === "ios" ? 30 : 0}
         >
-          <Logo resizeMode="cover" source={require("../../assets/logo.png")} />
+          <Logo
+            resizeMode="contain"
+            source={require("../../assets/logo.png")}
+          />
           {children}
         </KeyboardAvoidingView>
       </Container>
