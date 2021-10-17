@@ -2,7 +2,7 @@ import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import TabIcon from "../components/nav/TabIcon";
 import { View } from "react-native";
-import StackNavFactory from "../components/nav/StackNavFactory";
+import StackNavFactory from "../components/nav/SharedStackNav";
 
 const Tabs = createBottomTabNavigator();
 

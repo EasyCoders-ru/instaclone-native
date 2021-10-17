@@ -1,5 +1,6 @@
 import { createStackNavigator } from "@react-navigation/stack";
 import React from "react";
+import { Image } from "react-native";
 import Feed from "../../screens/Feed";
 import Me from "../../screens/Me";
 import Notifications from "../../screens/Notifications";
@@ -9,20 +10,34 @@ import Search from "../../screens/Search";
 
 const Stack = createStackNavigator();
 
-export default function StackNavFactory({ screenName }) {
+export default function SharedStackNav({ screenName }) {
   return (
     <Stack.Navigator
       screenOptions={{
+        headerMode: "screen",
         headerBackTitleVisible: false,
         headerTintColor: "white",
         headerStyle: {
           backgroundColor: "black",
           shadowColor: "rgba(255,255,255,0.3)",
+          borderBottomColor: "rgba(255,255,255,0.3)",
         },
       }}
     >
       {screenName === "Feed" ? (
-        <Stack.Screen name="Feed" component={Feed} />
+        <Stack.Screen
+          name="Feed"
+          component={Feed}
+          options={{
+            headerTitle: () => (
+              <Image
+                style={{ height: 40, width: 120 }}
+                resizeMode="contain"
+                source={require("../../assets/logo.png")}
+              />
+            ),
+          }}
+        />
       ) : null}
       {screenName === "Search" ? (
         <Stack.Screen name="Search" component={Search} />
