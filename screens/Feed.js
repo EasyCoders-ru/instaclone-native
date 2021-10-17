@@ -1,7 +1,7 @@
 import React from "react";
-import { Text, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 
-export default function Feed() {
+export default function Feed({ navigation }) {
   return (
     <View
       style={{
@@ -11,7 +11,9 @@ export default function Feed() {
         alignItems: "center",
       }}
     >
-      <Text style={{ color: "white" }}>Лента</Text>
+      <TouchableOpacity onPress={() => navigation.navigate("Photo")}>
+        <Text style={{ color: "white" }}>Фото</Text>
+      </TouchableOpacity>
     </View>
   );
 }

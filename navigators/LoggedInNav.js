@@ -10,6 +10,7 @@ export default function LoggedInNav() {
   return (
     <Tabs.Navigator
       screenOptions={{
+        headerShown: false,
         tabBarShowLabel: false,
         tabBarActiveTintColor: "white",
         tabBarStyle: {
