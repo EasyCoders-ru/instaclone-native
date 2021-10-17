@@ -1,7 +1,7 @@
 import React from "react";
 import { Text, View } from "react-native";
 
-export default function Feed() {
+export default function Profile() {
   return (
     <View
       style={{
@@ -11,7 +11,7 @@ export default function Feed() {
         alignItems: "center",
       }}
     >
-      <Text style={{ color: "white" }}>Лента</Text>
+      <Text style={{ color: "white" }}>Профиль</Text>
     </View>
   );
 }
