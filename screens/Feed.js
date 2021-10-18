@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Text, View, FlatList } from "react-native";
 import { gql, useQuery } from "@apollo/client";
 import { COMMENTS_FRAGMENT, POST_FRAGMENT } from "../fragments";
@@ -27,9 +27,15 @@ const SEE_FEED_QUERY = gql`
 `;
 
 export default function Feed({ navigation }) {
-  const { data, loading } = useQuery(SEE_FEED_QUERY);
+  const { data, loading, refetch } = useQuery(SEE_FEED_QUERY);
+  const [refreshing, setRefreshing] = useState(false);
 
   const renderPhoto = ({ item: photo }) => <Photo {...photo} />;
+  const refresh = async () => {
+    setRefreshing(true);
+    await refetch();
+    setRefreshing(false);
+  };
 
   return (
     <ScreenLayout loading={loading}>
@@ -39,6 +45,8 @@ export default function Feed({ navigation }) {
         keyExtractor={(photo) => "" + photo.id}
         showsVerticalScrollIndicator={false}
         style={{ width: "100%" }}
+        onRefresh={refresh}
+        refreshing={refreshing}
       />
     </ScreenLayout>
   );
