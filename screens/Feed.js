@@ -6,8 +6,8 @@ import ScreenLayout from "../components/ScreenLayout";
 import Photo from "../components/Photo";
 
 const SEE_FEED_QUERY = gql`
-  query seeFeed {
-    seeFeed {
+  query seeFeed($offset: Int!) {
+    seeFeed(offset: $offset) {
       ...PostFragment
       caption
       comments {
@@ -27,7 +27,11 @@ const SEE_FEED_QUERY = gql`
 `;
 
 export default function Feed({ navigation }) {
-  const { data, loading, refetch } = useQuery(SEE_FEED_QUERY);
+  const { data, loading, refetch, fetchMore } = useQuery(SEE_FEED_QUERY, {
+    variables: {
+      offset: 0,
+    },
+  });
   const [refreshing, setRefreshing] = useState(false);
 
   const renderPhoto = ({ item: photo }) => <Photo {...photo} />;
@@ -40,6 +44,14 @@ export default function Feed({ navigation }) {
   return (
     <ScreenLayout loading={loading}>
       <FlatList
+        onEndReachedThreshold={0}
+        onEndReached={() => {
+          fetchMore({
+            variables: {
+              offset: data?.seeFeed?.length,
+            },
+          });
+        }}
         data={data?.seeFeed}
         renderItem={renderPhoto}
         keyExtractor={(photo) => "" + photo.id}
