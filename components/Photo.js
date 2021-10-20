@@ -133,7 +133,7 @@ function Photo({ id, user, file, caption, likes, commentsNumber, isLiked }) {
         </Actions>
         <TouchableOpacity
           onPress={() => {
-            navigation.navigate("Likes");
+            navigation.navigate("Likes", { photoId: id });
           }}
         >
           <Likes>{likes === 1 ? "1 лайк" : `${likes} лайков`}</Likes>

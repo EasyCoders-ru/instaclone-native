@@ -1,17 +1,46 @@
-import React from "react";
-import { Text, View } from "react-native";
+import React, { useState } from "react";
+import { FlatList } from "react-native";
+import { gql, useQuery } from "@apollo/client";
+import { USERS_FRAGMENT } from "../fragments";
+import ScreenLayout from "../components/ScreenLayout";
+import UserRow from "../components/UserRow";
 
-export default function Likes() {
+const SEE_PHOTO_LIKES_QUERY = gql`
+  query seePhotoLikes($id: Int!) {
+    seePhotoLikes(id: $id) {
+      ...UserFragment
+    }
+  }
+  ${USERS_FRAGMENT}
+`;
+
+export default function Likes({ route }) {
+  const [refreshing, setRefreshing] = useState(false);
+  const { data, loading, refetch } = useQuery(SEE_PHOTO_LIKES_QUERY, {
+    variables: {
+      id: route?.params?.photoId,
+    },
+    skip: !route?.params?.photoId,
+  });
+
+  const renderUser = ({ item: user }) => <UserRow {...user} />;
+
+  const refresh = async () => {
+    setRefreshing(true);
+    await refetch();
+    setRefreshing(false);
+  };
+
   return (
-    <View
-      style={{
-        backgroundColor: "black",
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Text style={{ color: "white" }}>Список лайкнувших фото</Text>
-    </View>
+    <ScreenLayout loading={loading}>
+      <FlatList
+        data={data?.seePhotoLikes}
+        renderItem={renderUser}
+        keyExtractor={(user) => "" + user.id}
+        style={{ width: "100%" }}
+        onRefresh={refresh}
+        refreshing={refreshing}
+      />
+    </ScreenLayout>
   );
 }

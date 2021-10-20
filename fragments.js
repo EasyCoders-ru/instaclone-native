@@ -20,3 +20,13 @@ export const COMMENTS_FRAGMENT = gql`
     isMine
   }
 `;
+
+export const USERS_FRAGMENT = gql`
+  fragment UserFragment on User {
+    id
+    username
+    avatar
+    isMe
+    isFollowing
+  }
+`;
