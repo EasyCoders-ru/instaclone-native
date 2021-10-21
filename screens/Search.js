@@ -1,10 +1,21 @@
+import { useLazyQuery, gql } from "@apollo/client";
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
 import DismissKeyboard from "../components/DismissKeyboard";
 
+const SEARCH_PHOTOS_QUERY = gql`
+  query searchPhotos($keyword: String!) {
+    searchPhotos(keyword: $keyword) {
+      id
+      file
+    }
+  }
+`;
+
 export default function Search({ navigation }) {
   const { register, setValue } = useForm();
+  const [searchPhotos, { data, loading }] = useLazyQuery(SEARCH_PHOTOS_QUERY);
   const SearchBox = () => (
     <TextInput
       style={{ backgroundColor: "white" }}
