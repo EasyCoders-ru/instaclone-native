@@ -10,6 +10,7 @@ import client, { isLoggedInVar, tokenVar, cache } from "./apollo";
 import LoggedInNav from "./navigators/LoggedInNav";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AsyncStorageWrapper, persistCache } from "apollo3-cache-persist";
+import { Platform } from "react-native";
 
 export default function App() {
   const [loading, setLoading] = useState(true);
@@ -31,7 +32,7 @@ export default function App() {
     await persistCache({
       cache,
       storage: new AsyncStorageWrapper(AsyncStorage),
-      serialize: false,
+      serialize: Platform.OS !== "web",
     });
     return preloadAssets();
   };
