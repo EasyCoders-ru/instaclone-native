@@ -99,13 +99,13 @@ function Photo({ id, user, file, caption, likes, commentsNumber, isLiked }) {
     });
   }, [file]);
 
+  const goToProfile = () => {
+    navigation.navigate("Profile", { id: user.id, username: user.username });
+  };
+
   return (
     <Container>
-      <Header
-        onPress={() => {
-          navigation.navigate("Profile");
-        }}
-      >
+      <Header onPress={goToProfile}>
         <UserAvatar resizeMode="cover" source={{ uri: user?.avatar }} />
         <Username>{user.username}</Username>
       </Header>
@@ -139,11 +139,7 @@ function Photo({ id, user, file, caption, likes, commentsNumber, isLiked }) {
           <Likes>{likes === 1 ? "1 лайк" : `${likes} лайков`}</Likes>
         </TouchableOpacity>
         <Caption>
-          <TouchableOpacity
-            onPress={() => {
-              navigation.navigate("Profile");
-            }}
-          >
+          <TouchableOpacity onPress={goToProfile}>
             <Username>{user.username}</Username>
           </TouchableOpacity>
           <CaptionText>{caption}</CaptionText>

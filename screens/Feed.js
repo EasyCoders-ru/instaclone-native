@@ -14,6 +14,7 @@ const SEE_FEED_QUERY = gql`
         ...CommentFragment
       }
       user {
+        id
         username
         avatar
       }
