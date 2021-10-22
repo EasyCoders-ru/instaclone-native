@@ -1,7 +1,15 @@
 import { useLazyQuery, gql } from "@apollo/client";
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { ActivityIndicator, TextInput, View } from "react-native";
+import {
+  ActivityIndicator,
+  FlatList,
+  Image,
+  TextInput,
+  TouchableOpacity,
+  useWindowDimensions,
+  View,
+} from "react-native";
 import DismissKeyboard from "../components/DismissKeyboard";
 import styled from "styled-components/native";
 
@@ -25,7 +33,17 @@ const MessageText = styled.Text`
   font-weight: 600;
 `;
 
+const Input = styled.TextInput`
+  background-color: white;
+  width: ${(props) => props.width / 1.5}px;
+  color: black;
+  padding: 5px 10px;
+  border-radius: 7px;
+`;
+
 export default function Search({ navigation }) {
+  const numColumns = 4;
+  const { width } = useWindowDimensions();
   const { register, setValue, handleSubmit } = useForm();
   const [searchFn, { data, loading, called }] =
     useLazyQuery(SEARCH_PHOTOS_QUERY);
@@ -33,9 +51,9 @@ export default function Search({ navigation }) {
     searchFn({ variables: { keyword } });
   };
   const SearchBox = () => (
-    <TextInput
-      style={{ backgroundColor: "white" }}
-      placeholderTextColor="black"
+    <Input
+      width={width}
+      placeholderTextColor="rgba(0,0,0,0.8)"
       placeholder="Поиск по фото"
       autoCapitalize="none"
       autoCorrect={false}
@@ -52,6 +70,16 @@ export default function Search({ navigation }) {
     register("keyword", { required: true, minLength: 3 });
     navigation.setOptions({ headerTitle: SearchBox });
   }, [register]);
+
+  const renderPhotos = ({ item: photo }) => (
+    <TouchableOpacity>
+      <Image
+        source={{ uri: photo.file }}
+        style={{ width: width / numColumns, height: 100 }}
+      />
+    </TouchableOpacity>
+  );
+
   return (
     <DismissKeyboard>
       <View
@@ -72,11 +100,19 @@ export default function Search({ navigation }) {
           </MessageContainer>
         )}
         {typeof data?.searchPhotos !== "undefined" &&
-          data?.searchPhotos?.length === 0 && (
-            <MessageContainer>
-              <MessageText>Фотографий не найдено</MessageText>
-            </MessageContainer>
-          )}
+        data?.searchPhotos?.length === 0 ? (
+          <MessageContainer>
+            <MessageText>Фотографий не найдено</MessageText>
+          </MessageContainer>
+        ) : (
+          <FlatList
+            numColumns={numColumns}
+            data={data?.searchPhotos}
+            renderItem={renderPhotos}
+            keyExtractor={(photo) => "" + photo.id}
+            style={{ width: "100%" }}
+          />
+        )}
       </View>
     </DismissKeyboard>
   );
