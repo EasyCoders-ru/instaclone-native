@@ -1,10 +1,15 @@
 import React from "react";
-import { Text, View } from "react-native";
+import styled from "styled-components/native";
+
+const Container = styled.View``;
+const Top = styled.View``;
+const Bottom = styled.View``;
 
 export default function SelectPhoto() {
   return (
-    <View>
-      <Text>Выбор фото</Text>
-    </View>
+    <Container>
+      <Top></Top>
+      <Bottom></Bottom>
+    </Container>
   );
 }
