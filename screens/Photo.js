@@ -15,6 +15,8 @@ const SEE_PHOTO_QUERY = gql`
         username
         avatar
       }
+      isMine
+      isLiked
     }
   }
   ${POST_FRAGMENT}
