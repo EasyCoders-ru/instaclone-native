@@ -36,6 +36,7 @@ export default function Feed({ navigation }) {
   const [refreshing, setRefreshing] = useState(false);
 
   const renderPhoto = ({ item: photo }) => <Photo {...photo} />;
+  
   const refresh = async () => {
     setRefreshing(true);
     await refetch();

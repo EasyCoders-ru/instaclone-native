@@ -5,7 +5,6 @@ import {
   ActivityIndicator,
   FlatList,
   Image,
-  TextInput,
   TouchableOpacity,
   useWindowDimensions,
   View,
@@ -72,7 +71,11 @@ export default function Search({ navigation }) {
   }, [register]);
 
   const renderPhotos = ({ item: photo }) => (
-    <TouchableOpacity>
+    <TouchableOpacity
+      onPress={() => {
+        navigation.navigate("Photo", { photoId: photo.id });
+      }}
+    >
       <Image
         source={{ uri: photo.file }}
         style={{ width: width / numColumns, height: 100 }}

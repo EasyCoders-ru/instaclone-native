@@ -1,21 +1,53 @@
-import React from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import React, { useState } from "react";
+import { ScrollView, RefreshControl } from "react-native";
+import ScreenLayout from "../components/ScreenLayout";
+import { gql, useQuery } from "@apollo/client";
+import { POST_FRAGMENT } from "../fragments";
+import Photo from "../components/Photo";
 
-export default function Photo({ navigation }) {
+const SEE_PHOTO_QUERY = gql`
+  query seePhoto($id: Int!) {
+    seePhoto(id: $id) {
+      ...PostFragment
+      caption
+      user {
+        id
+        username
+        avatar
+      }
+    }
+  }
+  ${POST_FRAGMENT}
+`;
+
+export default function PhotoScreen({ route }) {
+  const [refreshing, setRefreshing] = useState(false);
+
+  const { data, loading, refetch } = useQuery(SEE_PHOTO_QUERY, {
+    variables: { id: route?.params?.photoId },
+  });
+
+  const refresh = async () => {
+    setRefreshing(true);
+    await refetch();
+    setRefreshing(false);
+  };
+
   return (
-    <View
-      style={{
-        backgroundColor: "black",
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <TouchableOpacity onPress={() => navigation.navigate("Profile")}>
-        <Text style={{ color: "white" }}>Профиль автора</Text>
-      </TouchableOpacity>
-
-      <Text style={{ color: "white" }}>Фото</Text>
-    </View>
+    <ScreenLayout loading={loading}>
+      <ScrollView
+        style={{ backgroundColor: "black" }}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={refresh} />
+        }
+        contentContainerStyle={{
+          backgroundColor: "black",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Photo {...data?.seePhoto} />
+      </ScrollView>
+    </ScreenLayout>
   );
 }
