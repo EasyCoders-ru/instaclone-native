@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
-import { TouchableOpacity, StatusBar } from "react-native";
+import { TouchableOpacity, StatusBar, Image } from "react-native";
 import styled from "styled-components/native";
 import { Camera } from "expo-camera";
 import { Ionicons } from "@expo/vector-icons";
 import Slider from "@react-native-community/slider";
+import * as MediaLibrary from "expo-media-library";
 
 const Container = styled.View`
   flex: 1;
@@ -43,6 +44,16 @@ const CloseButton = styled.TouchableOpacity`
   left: 20px;
 `;
 
+const PhotoAction = styled.TouchableOpacity`
+  padding: 5px 10px;
+  border-radius: 5px;
+  background-color: white;
+`;
+
+const PhotoActionText = styled.Text`
+  font-weight: 600;
+`;
+
 export default function TakePhoto({ navigation }) {
   const camera = useRef();
   const [ok, setOk] = useState(false);
@@ -50,6 +61,7 @@ export default function TakePhoto({ navigation }) {
   const [cameraType, setCameraType] = useState(Camera.Constants.Type.front);
   const [zoom, setZoom] = useState(0);
   const [cameraReady, setCameraReady] = useState(false);
+  const [takenPhoto, setTakenPhoto] = useState("");
 
   const requestPermissions = async () => {
     const { status } = await Camera.requestPermissionsAsync();
@@ -88,75 +100,99 @@ export default function TakePhoto({ navigation }) {
 
   const takePhoto = async () => {
     if (camera.current && cameraReady) {
-      const photo = await camera.current.takePictureAsync({
+      const { uri } = await camera.current.takePictureAsync({
         quality: 0.75,
         exif: true,
       });
-      console.log(photo);
+      setTakenPhoto(uri);
+      //const asset = await MediaLibrary.createAssetAsync(uri);
     }
+  };
+
+  const onDismiss = () => {
+    setTakenPhoto("");
   };
 
   return (
     <Container>
       <StatusBar hidden={true} />
-      <Camera
-        ref={camera}
-        type={cameraType}
-        style={{ flex: 1 }}
-        zoom={zoom}
-        flashMode={flashMode}
-        onCameraReady={onCameraReady}
-      >
-        <CloseButton onPress={() => navigation.navigate("Tabs")}>
-          <Ionicons name="close" color="white" size={30} />
-        </CloseButton>
-      </Camera>
-      <SliderContainer>
-        <Slider
-          style={{ width: 200, height: 20 }}
-          minimumValue={0}
-          maximumValue={1}
-          minimumTrackTintColor="#FFFFFF"
-          maximumTrackTintColor="rgba(255,255,255,0.5)"
-          onValueChange={onZoomChange}
-        />
-      </SliderContainer>
-      <Actions>
-        <ButtonsContainer>
-          <TakePhotoBtn onPress={takePhoto} />
-          <ActionsContainer>
-            <TouchableOpacity
-              onPress={onFlashChange}
-              style={{ marginRight: 30 }}
-            >
-              <Ionicons
-                name={
-                  flashMode === Camera.Constants.FlashMode.off
-                    ? "flash-off"
-                    : flashMode === Camera.Constants.FlashMode.on
-                    ? "flash"
-                    : flashMode === Camera.Constants.FlashMode.auto
-                    ? "eye"
-                    : ""
-                }
-                color="white"
-                size={30}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={onCameraSwitch}>
-              <Ionicons
-                name={
-                  cameraType === Camera.Constants.Type.front
-                    ? "camera-reverse"
-                    : "camera"
-                }
-                color="white"
-                size={30}
-              />
-            </TouchableOpacity>
-          </ActionsContainer>
-        </ButtonsContainer>
-      </Actions>
+      {takenPhoto === "" ? (
+        <Camera
+          ref={camera}
+          type={cameraType}
+          style={{ flex: 1 }}
+          zoom={zoom}
+          flashMode={flashMode}
+          onCameraReady={onCameraReady}
+        >
+          <CloseButton onPress={() => navigation.navigate("Tabs")}>
+            <Ionicons name="close" color="white" size={30} />
+          </CloseButton>
+        </Camera>
+      ) : (
+        <Image source={{ uri: takenPhoto }} style={{ flex: 1 }} />
+      )}
+
+      {takenPhoto === "" ? (
+        <Actions>
+          <SliderContainer>
+            <Slider
+              style={{ width: 200, height: 20 }}
+              minimumValue={0}
+              maximumValue={1}
+              minimumTrackTintColor="#FFFFFF"
+              maximumTrackTintColor="rgba(255,255,255,0.5)"
+              onValueChange={onZoomChange}
+            />
+          </SliderContainer>
+          <ButtonsContainer>
+            <TakePhotoBtn onPress={takePhoto} />
+            <ActionsContainer>
+              <TouchableOpacity
+                onPress={onFlashChange}
+                style={{ marginRight: 30 }}
+              >
+                <Ionicons
+                  name={
+                    flashMode === Camera.Constants.FlashMode.off
+                      ? "flash-off"
+                      : flashMode === Camera.Constants.FlashMode.on
+                      ? "flash"
+                      : flashMode === Camera.Constants.FlashMode.auto
+                      ? "eye"
+                      : ""
+                  }
+                  color="white"
+                  size={30}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={onCameraSwitch}>
+                <Ionicons
+                  name={
+                    cameraType === Camera.Constants.Type.front
+                      ? "camera-reverse"
+                      : "camera"
+                  }
+                  color="white"
+                  size={30}
+                />
+              </TouchableOpacity>
+            </ActionsContainer>
+          </ButtonsContainer>
+        </Actions>
+      ) : (
+        <Actions>
+          <PhotoAction onPress={onDismiss}>
+            <PhotoActionText>Отмена</PhotoActionText>
+          </PhotoAction>
+          <PhotoAction>
+            <PhotoActionText>Загрузить</PhotoActionText>
+          </PhotoAction>
+          <PhotoAction>
+            <PhotoActionText>Сохранить и загрузить</PhotoActionText>
+          </PhotoAction>
+        </Actions>
+      )}
     </Container>
   );
 }
