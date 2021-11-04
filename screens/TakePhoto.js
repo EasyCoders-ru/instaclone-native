@@ -121,7 +121,7 @@ export default function TakePhoto({ navigation }) {
     if (save) {
       await MediaLibrary.saveToLibraryAsync(takenPhoto);
     }
-    console.log(`Будет загружена фото ${takenPhoto}`);
+    navigation.navigate("UploadForm", { file: takenPhoto });
   };
 
   const onUpload = () => {

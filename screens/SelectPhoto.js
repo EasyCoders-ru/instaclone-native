@@ -65,7 +65,9 @@ export default function SelectPhoto({ navigation }) {
   };
 
   const HeaderRight = () => (
-    <TouchableOpacity>
+    <TouchableOpacity
+      onPress={() => navigation.navigate("UploadForm", { file: choosenPhoto })}
+    >
       <HeaderRightText>Далее</HeaderRightText>
     </TouchableOpacity>
   );
