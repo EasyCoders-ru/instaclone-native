@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { TouchableOpacity, StatusBar } from "react-native";
 import styled from "styled-components/native";
 import { Camera } from "expo-camera";
@@ -44,10 +44,12 @@ const CloseButton = styled.TouchableOpacity`
 `;
 
 export default function TakePhoto({ navigation }) {
+  const camera = useRef();
   const [ok, setOk] = useState(false);
   const [flashMode, setFlashMode] = useState(Camera.Constants.FlashMode.off);
   const [cameraType, setCameraType] = useState(Camera.Constants.Type.front);
   const [zoom, setZoom] = useState(0);
+  const [cameraReady, setCameraReady] = useState(false);
 
   const requestPermissions = async () => {
     const { status } = await Camera.requestPermissionsAsync();
@@ -70,6 +72,10 @@ export default function TakePhoto({ navigation }) {
     setZoom(e);
   };
 
+  const onCameraReady = () => {
+    setCameraReady(true);
+  };
+
   const onFlashChange = () => {
     if (flashMode === Camera.Constants.FlashMode.off) {
       setFlashMode(Camera.Constants.FlashMode.on);
@@ -80,14 +86,26 @@ export default function TakePhoto({ navigation }) {
     }
   };
 
+  const takePhoto = async () => {
+    if (camera.current && cameraReady) {
+      const photo = await camera.current.takePictureAsync({
+        quality: 0.75,
+        exif: true,
+      });
+      console.log(photo);
+    }
+  };
+
   return (
     <Container>
       <StatusBar hidden={true} />
       <Camera
+        ref={camera}
         type={cameraType}
         style={{ flex: 1 }}
         zoom={zoom}
         flashMode={flashMode}
+        onCameraReady={onCameraReady}
       >
         <CloseButton onPress={() => navigation.navigate("Tabs")}>
           <Ionicons name="close" color="white" size={30} />
@@ -105,7 +123,7 @@ export default function TakePhoto({ navigation }) {
       </SliderContainer>
       <Actions>
         <ButtonsContainer>
-          <TakePhotoBtn />
+          <TakePhotoBtn onPress={takePhoto} />
           <ActionsContainer>
             <TouchableOpacity
               onPress={onFlashChange}
