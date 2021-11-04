@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { TouchableOpacity, StatusBar, Image } from "react-native";
+import { TouchableOpacity, StatusBar, Image, Alert } from "react-native";
 import styled from "styled-components/native";
 import { Camera } from "expo-camera";
 import { Ionicons } from "@expo/vector-icons";
@@ -44,8 +44,12 @@ const CloseButton = styled.TouchableOpacity`
   left: 20px;
 `;
 
+const PhotoActions = styled.View`
+  flex-direction: row;
+`;
+
 const PhotoAction = styled.TouchableOpacity`
-  padding: 5px 10px;
+  padding: 10px 25px;
   border-radius: 5px;
   background-color: white;
 `;
@@ -111,6 +115,30 @@ export default function TakePhoto({ navigation }) {
 
   const onDismiss = () => {
     setTakenPhoto("");
+  };
+
+  const goToUpload = async (save) => {
+    if (save) {
+      await MediaLibrary.saveToLibraryAsync(takenPhoto);
+    }
+    console.log(`Будет загружена фото ${takenPhoto}`);
+  };
+
+  const onUpload = () => {
+    Alert.alert(
+      "Сохранить фото?",
+      "Загрузить фото и сохранить в медиатеке или просто загрузить?",
+      [
+        {
+          text: "Загрузить и сохранить",
+          onPress: () => goToUpload(true),
+        },
+        {
+          text: "Просто загрузить",
+          onPress: () => goToUpload(false),
+        },
+      ]
+    );
   };
 
   return (
@@ -181,17 +209,14 @@ export default function TakePhoto({ navigation }) {
           </ButtonsContainer>
         </Actions>
       ) : (
-        <Actions>
+        <PhotoActions>
           <PhotoAction onPress={onDismiss}>
             <PhotoActionText>Отмена</PhotoActionText>
           </PhotoAction>
-          <PhotoAction>
+          <PhotoAction onPress={onUpload}>
             <PhotoActionText>Загрузить</PhotoActionText>
           </PhotoAction>
-          <PhotoAction>
-            <PhotoActionText>Сохранить и загрузить</PhotoActionText>
-          </PhotoAction>
-        </Actions>
+        </PhotoActions>
       )}
     </Container>
   );

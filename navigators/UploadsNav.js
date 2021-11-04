@@ -21,6 +21,11 @@ export default function UploadsNav() {
         },
       }}
     >
+      <Tabs.Screen
+        name="Take"
+        options={{ title: "Сделать фото" }}
+        component={TakePhoto}
+      />
       <Tabs.Screen name="Select" options={{ title: "Выбрать фото" }}>
         {() => (
           <Stack.Navigator
@@ -44,11 +49,6 @@ export default function UploadsNav() {
           </Stack.Navigator>
         )}
       </Tabs.Screen>
-      <Tabs.Screen
-        name="Take"
-        options={{ title: "Сделать фото" }}
-        component={TakePhoto}
-      />
     </Tabs.Navigator>
   );
 }
