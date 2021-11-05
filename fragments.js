@@ -45,3 +45,15 @@ export const FEED_PHOTO = gql`
   }
   ${POST_FRAGMENT}
 `;
+
+export const DIALOG_FRAGMENT = gql`
+  fragment DialogParts on Dialog {
+    id
+    users {
+      id
+      username
+      avatar
+    }
+    unreadTotal
+  }
+`;
