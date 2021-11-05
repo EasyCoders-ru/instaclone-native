@@ -108,8 +108,6 @@ export default function UploadForm({ navigation, route }) {
     });
   };
 
-  console.log(error);
-
   return (
     <DismissKeyboard>
       <Container>

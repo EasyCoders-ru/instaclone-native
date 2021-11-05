@@ -28,7 +28,7 @@ export const logUserOut = async () => {
 };
 
 const httpLink = createUploadLink({
-  uri: "https://05a56c83353cb9.lhr.domains/graphql",
+  uri: "http://localhost:4000/graphql",
 });
 
 const onErrorLink = onError(({ graphQLErrors, networkError }) => {

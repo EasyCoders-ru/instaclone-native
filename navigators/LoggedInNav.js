@@ -4,6 +4,7 @@ import TabsNav from "./TabsNav";
 import UploadsNav from "./UploadsNav";
 import UploadForm from "../screens/UploadForm";
 import { Ionicons } from "@expo/vector-icons";
+import MessagesNav from "./MessagesNav";
 
 const Stack = createStackNavigator();
 
@@ -38,6 +39,11 @@ export default function LoggedInNav() {
             backgroundColor: "black",
           },
         }}
+      />
+      <Stack.Screen
+        name="Messages"
+        component={MessagesNav}
+        options={{ headerShown: false }}
       />
     </Stack.Navigator>
   );
