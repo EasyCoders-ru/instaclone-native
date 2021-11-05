@@ -4,6 +4,9 @@ import { ActivityIndicator, TouchableOpacity } from "react-native";
 import styled from "styled-components/native";
 import { colors } from "../colors";
 import DismissKeyboard from "../components/DismissKeyboard";
+import { gql, useMutation } from "@apollo/client";
+import { FEED_PHOTO } from "../fragments";
+import { ReactNativeFile } from "apollo-upload-client";
 
 const Container = styled.View`
   flex: 1;
@@ -33,13 +36,24 @@ const HeaderRightText = styled.Text`
   margin-right: 7px;
 `;
 
+const UPLOAD_PHOTO_MUTATION = gql`
+  mutation uploadPhoto($file: Upload!, $caption: String) {
+    uploadPhoto(file: $file, caption: $caption) {
+      ...FeedPhoto
+    }
+  }
+  ${FEED_PHOTO}
+`;
+
 export default function UploadForm({ navigation, route }) {
-  const { register, handleSubmit, getValues, setValue } = useForm();
+  const { register, handleSubmit, setValue } = useForm();
+
+  const [uploadPhotoMutation, { loading, error }] = useMutation(
+    UPLOAD_PHOTO_MUTATION
+  );
 
   const HeaderRight = () => (
-    <TouchableOpacity
-      onPress={() => navigation.navigate("UploadForm", { file: choosenPhoto })}
-    >
+    <TouchableOpacity onPress={handleSubmit(onSubmitValid)}>
       <HeaderRightText>Далее</HeaderRightText>
     </TouchableOpacity>
   );
@@ -54,11 +68,26 @@ export default function UploadForm({ navigation, route }) {
 
   useEffect(() => {
     navigation.setOptions({
-      headerRight: HeaderRightLoading,
+      headerRight: loading ? HeaderRightLoading : HeaderRight,
+      ...(loading && { headerLeft: () => null }),
     });
-  });
+  }, [loading]);
 
-  const onSubmitValid = ({ caption }) => {};
+  const onSubmitValid = ({ caption }) => {
+    const file = new ReactNativeFile({
+      uri: route.params.file,
+      type: "image/jpeg",
+      name: "1.jpg",
+    });
+    uploadPhotoMutation({
+      variables: {
+        file,
+        caption,
+      },
+    });
+  };
+
+  console.log(error);
 
   return (
     <DismissKeyboard>
