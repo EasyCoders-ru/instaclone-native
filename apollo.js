@@ -8,6 +8,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { setContext } from "@apollo/client/link/context";
 import { offsetLimitPagination } from "@apollo/client/utilities";
 import { onError } from "@apollo/client/link/error";
+import { createUploadLink } from "apollo-upload-client";
 
 const TOKEN = "token";
 
@@ -26,7 +27,7 @@ export const logUserOut = async () => {
   tokenVar(null);
 };
 
-const httpLink = createHttpLink({
+const httpLink = createUploadLink({
   uri: "https://05a56c83353cb9.lhr.domains/graphql",
 });
 

@@ -48,8 +48,29 @@ const UPLOAD_PHOTO_MUTATION = gql`
 export default function UploadForm({ navigation, route }) {
   const { register, handleSubmit, setValue } = useForm();
 
+  const updateUploadPhoto = (cache, result) => {
+    const {
+      data: { uploadPhoto },
+    } = result;
+
+    if (uploadPhoto.id) {
+      cache.modify({
+        id: "ROOT_QUERY",
+        fields: {
+          seeFeed(prev) {
+            return [...prev, uploadPhoto];
+          },
+        },
+      });
+      navigation.navigate("Tabs");
+    }
+  };
+
   const [uploadPhotoMutation, { loading, error }] = useMutation(
-    UPLOAD_PHOTO_MUTATION
+    UPLOAD_PHOTO_MUTATION,
+    {
+      update: updateUploadPhoto,
+    }
   );
 
   const HeaderRight = () => (
