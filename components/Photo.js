@@ -95,7 +95,7 @@ function Photo({ id, user, file, caption, likes, commentsNumber, isLiked }) {
   const [imageHeight, setImageHeight] = useState(height - 500);
   useEffect(() => {
     Image.getSize(file, (width, height) => {
-      setImageHeight(height / 3);
+      setImageHeight(Math.min(height / 3, 450));
     });
   }, [file]);
 
