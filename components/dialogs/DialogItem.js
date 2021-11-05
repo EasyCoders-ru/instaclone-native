@@ -5,7 +5,6 @@ import { colors } from "../../colors";
 import useMe from "../../hooks/useMe";
 
 const DialogContainer = styled.TouchableOpacity`
-  width: 100%;
   padding: 15px 10px;
   background-color: black;
   flex-direction: row;
