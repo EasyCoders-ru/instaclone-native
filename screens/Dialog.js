@@ -1,9 +1,11 @@
 import React, { useEffect } from "react";
-import { FlatList, KeyboardAvoidingView } from "react-native";
-import { gql, useQuery } from "@apollo/client";
+import { FlatList, KeyboardAvoidingView, View } from "react-native";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import { DIALOG_FRAGMENT } from "../fragments";
 import ScreenLayout from "../components/ScreenLayout";
 import styled from "styled-components/native";
+import { useForm } from "react-hook-form";
+import useMe from "../hooks/useMe";
 
 const SEE_DIALOG_QUERY = gql`
   query seeDialog($id: Int!) {
@@ -24,9 +26,19 @@ const SEE_DIALOG_QUERY = gql`
   ${DIALOG_FRAGMENT}
 `;
 
+const SEND_MESSAGE_MUTATION = gql`
+  mutation sendMessage($payload: String!, $dialogId: Int, $userId: Int) {
+    sendMessage(payload: $payload, dialogId: $dialogId, userId: $userId) {
+      ok
+      error
+      id
+    }
+  }
+`;
+
 const MessageContainer = styled.View`
-  flex-direction: ${(props) => (props.outgoing ? "row-reverse" : "row")}
-  align-items: flex-end;
+  flex-direction: ${(props) => (props.outgoing ? "row-reverse" : "row")};
+  align-items: center;
   padding: 0 10px;
 `;
 const Author = styled.View``;
@@ -34,9 +46,6 @@ const Avatar = styled.Image`
   width: 20px;
   height: 20px;
   border-radius: 10px;
-`;
-const Username = styled.Text`
-  color: white;
 `;
 const Message = styled.Text`
   color: white;
@@ -58,9 +67,65 @@ const TextInput = styled.TextInput`
 `;
 
 export default function Dialog({ route, navigation }) {
+  const { data: meData } = useMe();
   const { data, loading } = useQuery(SEE_DIALOG_QUERY, {
     variables: { id: route?.params?.id },
   });
+
+  const onUpdate = (cache, result) => {
+    const {
+      data: {
+        sendMessage: { ok, id },
+      },
+    } = result;
+    if (meData && ok) {
+      const { message } = getValues();
+      const messageObj = {
+        id,
+        payload: message,
+        user: {
+          id: meData?.me?.id,
+          username: meData?.me?.username,
+          avatar: meData?.me?.avatar,
+        },
+        read: true,
+        __typename: "Message",
+      };
+      const messageFragment = cache.writeFragment({
+        id: `Message:${id}`,
+        fragment: gql`
+          fragment NewMessage on Message {
+            id
+            payload
+            user {
+              id
+              avatar
+              username
+            }
+            read
+          }
+        `,
+        data: messageObj,
+      });
+      cache.modify({
+        id: `Dialog:${route?.params?.id}`,
+        fields: {
+          messages(prev) {
+            return [...prev, messageFragment];
+          },
+        },
+      });
+    }
+  };
+
+  const [sendMessageMutation, { loading: sendingMessage }] = useMutation(
+    SEND_MESSAGE_MUTATION,
+    {
+      update: onUpdate,
+    }
+  );
+
+  const { handleSubmit, register, getValues, setValue } = useForm();
 
   useEffect(() => {
     navigation.setOptions({
@@ -68,13 +133,27 @@ export default function Dialog({ route, navigation }) {
     });
   });
 
+  useEffect(() => {
+    register("message", { required: true });
+  }, [register]);
+
+  const onSubmitValid = ({ message }) => {
+    if (!sendingMessage) {
+      sendMessageMutation({
+        variables: {
+          payload: message,
+          dialogId: route?.params?.id,
+        },
+      });
+    }
+  };
+
   const renderItem = ({ item: message }) => (
     <MessageContainer
       outgoing={message.user.username !== route?.params?.talkingTo?.username}
     >
       <Author>
         <Avatar source={{ uri: message?.user?.avatar }} />
-        <Username>{message?.user?.username}</Username>
       </Author>
       <Message>{message.payload}</Message>
     </MessageContainer>
@@ -91,14 +170,16 @@ export default function Dialog({ route, navigation }) {
           data={data?.seeDialog?.messages}
           keyExtractor={(message) => "" + message.id}
           renderItem={renderItem}
-          style={{ width: "100%" }}
-          inverted
+          style={{ width: "100%", paddingTop: 30 }}
+          ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
         />
         <TextInput
           placeholderTextColor="rgba(255, 255, 255, 0.5)"
           placeholder="Введите текст сообщения"
           returnKeyType="send"
           returnKeyLabel="Отправить"
+          onChangeText={(message) => setValue("message", message)}
+          onSubmitEditing={handleSubmit(onSubmitValid)}
         />
       </ScreenLayout>
     </KeyboardAvoidingView>
