@@ -27,6 +27,21 @@ const SEE_DIALOG_QUERY = gql`
   ${DIALOG_FRAGMENT}
 `;
 
+const DIALOG_UPDATES_SUBSCRIPTION = gql`
+  subscription dialogUpdates($id: Int!) {
+    dialogUpdates(id: $id) {
+      id
+      payload
+      user {
+        id
+        username
+        avatar
+      }
+      read
+    }
+  }
+`;
+
 const SEND_MESSAGE_MUTATION = gql`
   mutation sendMessage($payload: String!, $dialogId: Int, $userId: Int) {
     sendMessage(payload: $payload, dialogId: $dialogId, userId: $userId) {
@@ -78,9 +93,18 @@ const SendMessageBtn = styled.TouchableOpacity``;
 
 export default function Dialog({ route, navigation }) {
   const { data: meData } = useMe();
-  const { data, loading } = useQuery(SEE_DIALOG_QUERY, {
+  const { data, loading, subscribeToMore } = useQuery(SEE_DIALOG_QUERY, {
     variables: { id: route?.params?.id },
   });
+
+  useEffect(() => {
+    if (data?.seeDialog) {
+      subscribeToMore({
+        document: DIALOG_UPDATES_SUBSCRIPTION,
+        variables: { id: route?.params?.id },
+      });
+    }
+  }, [data]);
 
   const onUpdate = (cache, result) => {
     const {

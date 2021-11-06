@@ -1,10 +1,4 @@
-import {
-  ApolloClient,
-  InMemoryCache,
-  makeVar,
-  createHttpLink,
-  split,
-} from "@apollo/client";
+import { ApolloClient, InMemoryCache, makeVar, split } from "@apollo/client";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { setContext } from "@apollo/client/link/context";
 import {
@@ -49,9 +43,9 @@ const wsLink = new WebSocketLink({
   uri: "ws://localhost:4000/graphql",
   options: {
     reconnect: true,
-    connectionParams: {
+    connectionParams: () => ({
       token: tokenVar(),
-    },
+    }),
   },
 });
 
