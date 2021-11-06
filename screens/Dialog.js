@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { FlatList, KeyboardAvoidingView, View } from "react-native";
-import { gql, useMutation, useQuery } from "@apollo/client";
+import { gql, useApolloClient, useMutation, useQuery } from "@apollo/client";
 import { DIALOG_FRAGMENT } from "../fragments";
 import ScreenLayout from "../components/ScreenLayout";
 import styled from "styled-components/native";
@@ -93,15 +93,54 @@ const SendMessageBtn = styled.TouchableOpacity``;
 
 export default function Dialog({ route, navigation }) {
   const { data: meData } = useMe();
+
   const { data, loading, subscribeToMore } = useQuery(SEE_DIALOG_QUERY, {
     variables: { id: route?.params?.id },
   });
+
+  const client = useApolloClient();
+
+  const updateQuery = (prevQuery, result) => {
+    const {
+      subscriptionData: {
+        data: { dialogUpdates: message },
+      },
+    } = result;
+
+    if (message.id) {
+      const newMessage = client.cache.writeFragment({
+        id: `Message:${message.id}`,
+        fragment: gql`
+          fragment NewMessage on Message {
+            id
+            payload
+            user {
+              id
+              avatar
+              username
+            }
+            read
+          }
+        `,
+        data: message,
+      });
+      client.cache.modify({
+        id: `Dialog:${route?.params?.id}`,
+        fields: {
+          messages(prev) {
+            return [...prev, newMessage];
+          },
+        },
+      });
+    }
+  };
 
   useEffect(() => {
     if (data?.seeDialog) {
       subscribeToMore({
         document: DIALOG_UPDATES_SUBSCRIPTION,
         variables: { id: route?.params?.id },
+        updateQuery,
       });
     }
   }, [data]);
