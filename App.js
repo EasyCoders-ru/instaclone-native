@@ -29,11 +29,7 @@ export default function App() {
       isLoggedInVar(true);
       tokenVar(token);
     }
-    await persistCache({
-      cache,
-      storage: new AsyncStorageWrapper(AsyncStorage),
-      serialize: Platform.OS !== "web",
-    });
+
     return preloadAssets();
   };
 

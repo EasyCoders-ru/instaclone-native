@@ -80,6 +80,7 @@ export default function Dialog({ route, navigation }) {
     } = result;
     if (meData && ok) {
       const { message } = getValues();
+      setValue("message", "");
       const messageObj = {
         id,
         payload: message,
@@ -125,7 +126,7 @@ export default function Dialog({ route, navigation }) {
     }
   );
 
-  const { handleSubmit, register, getValues, setValue } = useForm();
+  const { handleSubmit, register, getValues, setValue, watch } = useForm();
 
   useEffect(() => {
     navigation.setOptions({
@@ -170,7 +171,7 @@ export default function Dialog({ route, navigation }) {
           data={data?.seeDialog?.messages}
           keyExtractor={(message) => "" + message.id}
           renderItem={renderItem}
-          style={{ width: "100%", paddingTop: 30 }}
+          style={{ width: "100%", marginVertical: 30 }}
           ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
         />
         <TextInput
@@ -180,6 +181,7 @@ export default function Dialog({ route, navigation }) {
           returnKeyLabel="Отправить"
           onChangeText={(message) => setValue("message", message)}
           onSubmitEditing={handleSubmit(onSubmitValid)}
+          value={watch("message")}
         />
       </ScreenLayout>
     </KeyboardAvoidingView>
