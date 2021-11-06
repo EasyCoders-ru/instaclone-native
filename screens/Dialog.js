@@ -6,6 +6,8 @@ import ScreenLayout from "../components/ScreenLayout";
 import styled from "styled-components/native";
 import { useForm } from "react-hook-form";
 import useMe from "../hooks/useMe";
+import { Ionicons } from "@expo/vector-icons";
+import { get } from "react-native/Libraries/Utilities/PixelRatio";
 
 const SEE_DIALOG_QUERY = gql`
   query seeDialog($id: Int!) {
@@ -57,14 +59,23 @@ const Message = styled.Text`
   font-size: 16px;
 `;
 const TextInput = styled.TextInput`
-  width: 95%;
   padding: 10px 20px;
   border: 1px solid rgba(255, 255, 255, 0.5);
-  margin-bottom: 50px;
-  margin-top: 25px;
+  width: 90%;
   border-radius: 999px;
   color: white;
+  margin-right: 10px;
 `;
+
+const InputContainer = styled.View`
+  flex-direction: row;
+  align-items: center;
+  width: 95%;
+  margin-bottom: 50px;
+  margin-top: 25px;
+`;
+
+const SendMessageBtn = styled.TouchableOpacity``;
 
 export default function Dialog({ route, navigation }) {
   const { data: meData } = useMe();
@@ -160,6 +171,9 @@ export default function Dialog({ route, navigation }) {
     </MessageContainer>
   );
 
+  const messages = [...(data?.seeDialog?.messages ?? [])];
+  messages.reverse();
+
   return (
     <KeyboardAvoidingView
       style={{ backgroundColor: "black", flex: 1 }}
@@ -168,21 +182,37 @@ export default function Dialog({ route, navigation }) {
     >
       <ScreenLayout loading={loading}>
         <FlatList
-          data={data?.seeDialog?.messages}
+          data={messages}
           keyExtractor={(message) => "" + message.id}
           renderItem={renderItem}
           style={{ width: "100%", marginVertical: 30 }}
           ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
+          showsVerticalScrollIndicator={false}
+          inverted={true}
         />
-        <TextInput
-          placeholderTextColor="rgba(255, 255, 255, 0.5)"
-          placeholder="Введите текст сообщения"
-          returnKeyType="send"
-          returnKeyLabel="Отправить"
-          onChangeText={(message) => setValue("message", message)}
-          onSubmitEditing={handleSubmit(onSubmitValid)}
-          value={watch("message")}
-        />
+        <InputContainer>
+          <TextInput
+            placeholderTextColor="rgba(255, 255, 255, 0.5)"
+            placeholder="Введите текст сообщения"
+            returnKeyType="send"
+            returnKeyLabel="Отправить"
+            onChangeText={(message) => setValue("message", message)}
+            onSubmitEditing={handleSubmit(onSubmitValid)}
+            value={watch("message")}
+          />
+          <SendMessageBtn
+            onPress={handleSubmit(onSubmitValid)}
+            disabled={!Boolean(watch("message"))}
+          >
+            <Ionicons
+              name="send"
+              size={22}
+              color={
+                !Boolean(watch("message")) ? "rgba(255,255,255,0.5)" : "white"
+              }
+            />
+          </SendMessageBtn>
+        </InputContainer>
       </ScreenLayout>
     </KeyboardAvoidingView>
   );
