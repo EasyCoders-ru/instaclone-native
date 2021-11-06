@@ -49,7 +49,7 @@ const CaptionText = styled.Text`
 const UserAvatar = styled.Image`
   height: 25px;
   width: 25px;
-  border-radius: 12.5;
+  border-radius: 13px;
   margin-right: 10px;
 `;
 

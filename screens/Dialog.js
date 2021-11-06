@@ -7,7 +7,6 @@ import styled from "styled-components/native";
 import { useForm } from "react-hook-form";
 import useMe from "../hooks/useMe";
 import { Ionicons } from "@expo/vector-icons";
-import { get } from "react-native/Libraries/Utilities/PixelRatio";
 
 const SEE_DIALOG_QUERY = gql`
   query seeDialog($id: Int!) {
