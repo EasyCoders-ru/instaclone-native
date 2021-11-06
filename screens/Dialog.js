@@ -128,7 +128,14 @@ export default function Dialog({ route, navigation }) {
         id: `Dialog:${route?.params?.id}`,
         fields: {
           messages(prev) {
-            return [...prev, newMessage];
+            const existingMessage = prev.find(
+              (aMessage) => aMessage.__ref === newMessage.__ref
+            );
+            if (existingMessage) {
+              return prev;
+            } else {
+              return [...prev, newMessage];
+            }
           },
         },
       });
